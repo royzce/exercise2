@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Checkout from "./components/Checkout";
 import Dashboard from "./components/Dashboard";
@@ -12,6 +11,11 @@ function App() {
       return { ...product, qty: 0 };
     })
   );
+  const [toggleButton, setToggleButton] = useState(false);
+
+  const handleToggle = () => {
+    setToggleButton(!toggleButton);
+  };
 
   function handleIncrement(id) {
     setProducts(
@@ -51,27 +55,29 @@ function App() {
       )
     );
   }
-
+  const content = () => {
+    if (toggleButton) {
+      return <Checkout products={products} />;
+    }
+    return (
+      <Dashboard
+        products={products}
+        onIncrement={handleIncrement}
+        onDecrement={handleDecrement}
+        onAddToCart={handleAddToCart}
+        onRemoveCart={handleRemoveCart}
+      />
+    );
+  };
   return (
     <>
-      <NavBar products={products} />
+      <NavBar
+        products={products}
+        onToggleButton={handleToggle}
+        toggleButton={toggleButton}
+      />
 
-      <Routes>
-        <Route
-          path="/dashboard"
-          element={
-            <Dashboard
-              products={products}
-              onIncrement={handleIncrement}
-              onDecrement={handleDecrement}
-              onAddToCart={handleAddToCart}
-              onRemoveCart={handleRemoveCart}
-            />
-          }
-        />
-        <Route path="/cart-items" element={<Checkout products={products} />} />
-        <Route path="/" element={<Navigate to="/dashboard" />} />
-      </Routes>
+      {content()}
     </>
   );
 }
